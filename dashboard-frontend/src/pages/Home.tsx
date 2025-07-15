@@ -4,32 +4,36 @@ import { Link } from 'react-router-dom';
 const Home: React.FC = () => {
   return (
     <div className="main">
-      <section className="home-welcome">
-        <h1 className="home-heading">Welcome to the Dashboard System</h1>
-        <p className="home-subtext">Manage your dashboards, widgets, and users effortlessly.</p>
-      </section>
+      <div style={{ textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2.2rem', marginBottom: '1rem', color: 'var(--primary)' }}>
+          Welcome to the KPI Dashboard Builder
+        </h1>
 
-      <section className="quick-actions">
-        <h2 className="section-title">Quick Actions</h2>
-        <div className="card-grid">
-          <Link to="/create-user" className="quick-card">
-            <h3>Create User</h3>
-            <p>Add new users with assigned roles.</p>
-          </Link>
-          <Link to="/create-dashboard" className="quick-card">
-            <h3>Create Dashboard</h3>
-            <p>Build a new dashboard and manage widgets.</p>
-          </Link>
-          <Link to="/create-widget" className="quick-card">
-            <h3>Create Widget</h3>
-            <p>Add SQL-driven widgets to dashboards.</p>
-          </Link>
-          <Link to="/view-dashboards" className="quick-card">
-            <h3>View Dashboards</h3>
-            <p>Browse and manage all your dashboards.</p>
-          </Link>
+        <p style={{ fontSize: '1.1rem', color: 'var(--text-soft)', marginBottom: '2rem' }}>
+          This application lets you create powerful, visually-rich dashboards by writing raw SQL queries.
+          It’s ideal for managers, analysts, and developers who want to track performance indicators,
+          visualize data from existing tables, and present it all through interactive charts.
+        </p>
+
+        <div style={{ textAlign: 'left', marginBottom: '2.5rem' }}>
+          <h2 style={{ color: 'var(--text)' }}>🔍 Key Features:</h2>
+          <ul style={{ lineHeight: '1.8', paddingLeft: '1.5rem', marginTop: '1rem' }}>
+            <li><strong>Create Users:</strong> Define users who will own dashboards.</li>
+            <li><strong>Create Dashboards:</strong> Group related widgets under a named container.</li>
+            <li><strong>Create Widgets:</strong> Add SQL-powered visualizations like bar, pie, line charts.</li>
+            <li><strong>SQL-Based Charts:</strong> Write your own SQL query — results will be visualized automatically.</li>
+            <li><strong>Dark Mode Support:</strong> Switch between light and dark themes effortlessly.</li>
+            <li><strong>Live Data Ready:</strong> Planned integration for real-time charting from actual DB results.</li>
+          </ul>
         </div>
-      </section>
+
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <Link to="/create-user" className="btn btn-animate">➕ Create User</Link>
+          <Link to="/create-dashboard" className="btn btn-animate">📊 Create Dashboard</Link>
+          <Link to="/create-widget" className="btn btn-animate">📌 Add Widget</Link>
+          <Link to="/view-dashboards" className="btn btn-animate">📈 View Dashboards</Link>
+        </div>
+      </div>
     </div>
   );
 };
