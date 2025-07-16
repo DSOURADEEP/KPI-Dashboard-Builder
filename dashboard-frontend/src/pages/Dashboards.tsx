@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import ChartRenderer from '../components/ChartRenderer'; // Make sure this path is correct
+import WidgetChart from '../components/WidgetChart';
 
 const GET_DASHBOARDS = gql`
   query GetDashboards {
@@ -16,36 +16,21 @@ const GET_DASHBOARDS = gql`
   }
 `;
 
-const parseMockData = (sqlQuery: string) => {
-  if (sqlQuery.includes('sales_data')) {
-    return { labels: ['Jan', 'Feb', 'Mar', 'Apr'], values: [12000, 15000, 18000, 21000] };
-  }
-  if (sqlQuery.includes('customers')) {
-    return { labels: ['18-25', '26-35', '36-45'], values: [80, 120, 60] };
-  }
-  if (sqlQuery.includes('sales_by_region')) {
-    return { labels: ['North', 'South', 'East', 'West'], values: [3000, 5000, 2000, 4000] };
-  }
-  if (sqlQuery.includes('inventory')) {
-    return { labels: ['Electronics', 'Furniture', 'Clothing'], values: [70, 40, 90] };
-  }
-
-  return { labels: ['A', 'B', 'C'], values: [10, 20, 30] };
-};
-
 const Dashboards: React.FC = () => {
   const { data, loading, error } = useQuery(GET_DASHBOARDS);
-  const [selectedDashboardId, setSelectedDashboardId] = useState<number | 'all'>('all');
+  const [selectedDashboardId, setSelectedDashboardId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!selectedDashboardId && data?.dashboards?.length > 0) {
+      setSelectedDashboardId(data.dashboards[0].id); // default to first dashboard
+    }
+  }, [data, selectedDashboardId]);
 
   if (loading) return <p>Loading dashboards...</p>;
   if (error) return <p>Error loading dashboards: {error.message}</p>;
 
   const dashboards = data?.dashboards || [];
-
-  const filteredDashboards =
-    selectedDashboardId === 'all'
-      ? dashboards
-      : dashboards.filter((d: any) => d.id === selectedDashboardId);
+  const selectedDashboard = dashboards.find((d: any) => d.id === selectedDashboardId);
 
   return (
     <div className="main">
@@ -56,13 +41,12 @@ const Dashboards: React.FC = () => {
         <select
           id="dashboard-select"
           className="btn"
-          value={selectedDashboardId}
+          value={selectedDashboardId ?? ''}
           onChange={(e) => {
             const val = e.target.value;
-            setSelectedDashboardId(val === 'all' ? 'all' : parseInt(val));
+            setSelectedDashboardId(val ? parseInt(val) : null);
           }}
         >
-          <option value="all">All Dashboards</option>
           {dashboards.map((d: any) => (
             <option key={d.id} value={d.id}>
               {d.title} (ID: {d.id})
@@ -71,26 +55,23 @@ const Dashboards: React.FC = () => {
         </select>
       </div>
 
-      <div className="dashboard-container">
-        {filteredDashboards.map((dashboard: any) => (
-          <div key={dashboard.id} className="dashboard-section">
+      {selectedDashboard ? (
+        <div className="dashboard-container">
+          <div className="dashboard-section">
             <h2 className="dashboard-title">
-              {dashboard.title}{' '}
+              {selectedDashboard.title}{' '}
               <span style={{ fontSize: '0.9rem', color: 'var(--text-soft)' }}>
-                (ID: {dashboard.id})
+                (ID: {selectedDashboard.id})
               </span>
             </h2>
 
             <div className="widget-grid">
-              {dashboard.widgets.length > 0 ? (
-                dashboard.widgets.map((widget: any) => (
+              {selectedDashboard.widgets.length > 0 ? (
+                selectedDashboard.widgets.map((widget: any) => (
                   <div key={widget.id} className="widget-card">
                     <h3>{widget.type.toUpperCase()} Chart</h3>
                     <div style={{ height: '250px' }}>
-                      <ChartRenderer
-                        type={widget.type}
-                        data={parseMockData(widget.sqlQuery)}
-                      />
+                      <WidgetChart type={widget.type} sqlQuery={widget.sqlQuery} />
                     </div>
                   </div>
                 ))
@@ -99,12 +80,16 @@ const Dashboards: React.FC = () => {
               )}
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <p>No dashboard selected</p>
+      )}
     </div>
   );
 };
 
 export default Dashboards;
+
+
 
 
